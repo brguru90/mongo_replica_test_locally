@@ -5,9 +5,12 @@ if ! whoami | grep -q "root" -i; then
     exit
 fi
 
+full_path=$(realpath $0)
+cur_dir=$(dirname $full_path)
+
 port="27019"
 CUR_HOST="127.0.0.1"
-CUR_DIR="./mongodb/"
+CUR_DIR="$cur_dir/mongodb/"
 
 if [ -n "$1" ]
 then
@@ -36,19 +39,19 @@ logPath="$basedir/logs"
 mkdir -p "./mongodb/$basedir"
 
 
-running=$(lsof -i :$port | wc -l)
-if [ $running -eq 0 ]
-then
-    echo "resetting $port"
-    fuser -k $port/tcp
-    rm -rf "./mongodb/$basedir"
-else
-    echo "$port already running"
-    echo -e "use admin;\nrs.add({ host:'localhost:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
-    echo "replicasetkeyCisco123" > key.txt
-    mongo -u __system -p "$(tr -d '\011-\015\040' < key.txt)" --authenticationDatabase local < "$basedir/add_replicaset.js"
-    exit 0
-fi
+# running=$(lsof -i :$port | wc -l)
+# if [ $running -eq 0 ]
+# then
+#     echo "resetting $port"
+#     fuser -k $port/tcp
+#     rm -rf "./mongodb/$basedir"
+# else
+#     echo "$port already running"
+#     echo -e "use admin;\nrs.add({ host:'localhost:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
+#     echo "replicasetkeyCisco123" > key.txt
+#     mongo -u __system -p "$(tr -d '\011-\015\040' < key.txt)" --authenticationDatabase local < "$basedir/add_replicaset.js"
+#     exit 0
+# fi
 
 
 mkdir -p $dbPath
@@ -70,9 +73,11 @@ ls -lR $basedir
 ls -l
 
 
+cp ./mongod.conf $cur_dir/mongod.conf -f
 
+fuser -k $port/tcp
 
-cmd1="mongod --config ./mongod.conf \\
+cmd1="mongod --config $cur_dir/mongod.conf \\
     --port $port \\
     --unixSocketPrefix $pathPrefix \\
     --pidfilepath $pidFilePath \\
@@ -145,7 +150,7 @@ systemctl stop $service_file2
 systemctl enable $service_file2
 systemctl start $service_file2
 
+sleep 1
 
-
-systemctl status $service_file1
-systemctl status $service_file2
+systemctl status $service_file1 &
+systemctl status $service_file2 &
