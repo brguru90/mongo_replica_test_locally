@@ -51,6 +51,8 @@ ls -lR ./mongodb/$basedir
 ls -l
 
 
+chmod 400 $keyFile
+
 
 
 echo -e "use admin;\nrs.add({ host:'localhost:$port', priority: 0, votes: 0 });\nexit\n" > "./mongodb/$basedir/add_replicaset.js"

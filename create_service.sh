@@ -12,6 +12,10 @@ port="27019"
 CUR_HOST="127.0.0.1"
 CUR_DIR="$cur_dir/mongodb/"
 
+MASTER_HOST="localhost"
+MASTER_USERNAME="root"
+MASTER_PASSWORD="root"
+
 if [ -n "$1" ]
 then
     port=$1
@@ -19,24 +23,39 @@ fi
 
 if [ -n "$2" ]
 then
-    CUR_HOST=$2
+    CUR_DIR=$2
 fi
 
 if [ -n "$3" ]
 then
-    CUR_DIR=$3
+    CUR_HOST=$3
+fi
+
+if [ -n "$4" ]
+then
+    MASTER_HOST=$4
+fi
+
+if [ -n "$5" ]
+then
+    MASTER_USERNAME=$5
+fi
+
+if [ -n "$6" ]
+then
+    MASTER_PASSWORD=$6
 fi
 
 
 
-basedir="$CUR_DIR/port_$port"
+basedir="$CUR_DIR/mongodb_replicaset/port_$port"
 pathPrefix="$basedir/tmp"
 pidFilePath="$pathPrefix/mongodb.pid"
 keyFile="$basedir/key.txt"
 dbPath="$basedir/data/db"
 logPath="$basedir/logs"
 
-mkdir -p "./mongodb/$basedir"
+mkdir -p "$basedir"
 
 
 # running=$(lsof -i :$port | wc -l)
@@ -61,19 +80,21 @@ touch "$logPath/mongodb.log"
 
 echo "replicasetkeyCisco123" > $keyFile
 
-chmod 600  $basedir
+chmod 611  $basedir
+chmod 600 $logPath/mongodb.log
 chown mongodb:mongodb  $basedir
-
-chmod 600 -R $basedir
 chown mongodb:mongodb -R $basedir ./mongod.conf
 # chmod 600  $basedir/key.txt
 # chown root:root ./mongod.conf
-chmod 644 ./mongod.conf
+
+chmod 400 $keyFile
+
 ls -lR $basedir
 ls -l
 
 
 cp ./mongod.conf $cur_dir/mongod.conf -f
+chmod 644 ./mongod.conf $cur_dir/mongod.conf
 
 fuser -k $port/tcp
 
@@ -86,8 +107,12 @@ cmd1="mongod --config $cur_dir/mongod.conf \\
     --logpath '$logPath/mongodb.log'"
 
 
-echo -e "use admin;\nrs.add({ host:'localhost:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
-cmd2="mongo -u __system -p \"$(tr -d '\011-\015\040' < $keyFile)\" --authenticationDatabase local <  \"$basedir/add_replicaset.js\" "
+echo -e "use admin;\nrs.add({ host:'$CUR_HOST:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
+cmd2="mongo \\
+    --username $MASTER_USERNAME \\
+    --password $MASTER_PASSWORD \\
+    --host $MASTER_HOST \\
+    --authenticationDatabase admin < $basedir/add_replicaset.js"
 
 
 service_config_1="
@@ -118,9 +143,9 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 Restart=always
-RestartSec=60
+RestartSec=5
 User=root
-ExecStart=$cmd2
+ExecStart=/usr/bin/bash -c \"$cmd2\"
 StandardInput=tty-force
 
 [Install]
@@ -150,7 +175,7 @@ systemctl stop $service_file2
 systemctl enable $service_file2
 systemctl start $service_file2
 
-sleep 1
+# sleep 1
 
-systemctl status $service_file1 &
-systemctl status $service_file2 &
+# systemctl status $service_file1
+# systemctl status $service_file2
