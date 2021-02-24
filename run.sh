@@ -65,5 +65,4 @@ mongod --config ./mongod.conf \
     --keyFile $keyFile \
     --dbpath $dbPath \
     --logpath "$logPath/mongodb.log"
-echo $?
-echo "mongodb stoped"
+echo "mongodb stoped with exit code $?"
