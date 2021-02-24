@@ -130,7 +130,7 @@ Type=simple
 Restart=always
 RestartSec=10
 User=root
-ExecStart=$cmd1
+ExecStart=/usr/bin/bash -c \"$cmd1\"
 StandardInput=tty-force
 
 [Install]
@@ -147,7 +147,7 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 Restart=always
-RestartSec=5
+RestartSec=60
 User=root
 ExecStart=/usr/bin/bash -c \"$cmd2\"
 StandardInput=tty-force
