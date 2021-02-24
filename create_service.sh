@@ -84,6 +84,10 @@ chmod 611  $basedir
 chmod 600 $logPath/mongodb.log
 chown mongodb:mongodb  $basedir
 chown mongodb:mongodb -R $basedir ./mongod.conf
+
+
+chown mongod:mongod  $basedir
+chown mongod:mongod -R $basedir ./mongod.conf
 # chmod 600  $basedir/key.txt
 # chown root:root ./mongod.conf
 
