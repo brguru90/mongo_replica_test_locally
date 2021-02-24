@@ -89,8 +89,8 @@ chown mongodb:mongodb -R $basedir ./mongod.conf
 
 chmod 400 $keyFile
 
-ls -lR $basedir
-ls -l
+# ls -lR $basedir
+# ls -l
 
 
 cp ./mongod.conf $cur_dir/mongod.conf -f
@@ -104,7 +104,7 @@ cmd1="mongod --config $cur_dir/mongod.conf \\
     --pidfilepath $pidFilePath \\
     --keyFile $keyFile \\
     --dbpath $dbPath \\
-    --logpath '$logPath/mongodb.log'"
+    --logpath $logPath/mongodb.log"
 
 
 echo -e "use admin;\nrs.add({ host:'$CUR_HOST:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
