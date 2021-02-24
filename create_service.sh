@@ -123,6 +123,8 @@ cmd2="mongo \\
     --host $MASTER_HOST \\
     --authenticationDatabase admin < $basedir/add_replicaset.js"
 
+echo "$cmd2" > "$basedir/add_replicaset.sh"
+
 
 service_config_1="
 [Unit]
@@ -154,7 +156,7 @@ Type=simple
 Restart=always
 RestartSec=60
 User=root
-ExecStart=/usr/bin/bash -c \"$cmd2\"
+ExecStart=/usr/bin/bash -c \"bash $basedir/add_replicaset.sh\"
 StandardInput=tty-force
 
 [Install]
