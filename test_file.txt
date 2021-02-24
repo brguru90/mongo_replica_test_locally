@@ -1,0 +1,17 @@
+
+[Unit]
+Description=mongo_replica_add_port_27019
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=60
+User=root
+ExecStart=mongo -u __system -p "replicasetkeyCisco123" --authenticationDatabase local <  "./mongodb//port_27019/add_replicaset.js" 
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target
+
