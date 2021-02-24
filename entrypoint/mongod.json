@@ -1,0 +1,41 @@
+{
+    "storage": {
+        "dbPath": "/mongodb/data/db",
+        "journal": {
+            "enabled": true
+        },
+        "directoryPerDB": false
+    },
+    "systemLog": {
+        "destination": "file",
+        "quiet": false,
+        "logAppend": true,
+        "logRotate": "reopen",
+        "path": "/mongodb/logs/mongodb.log",
+        "verbosity": 5
+    },
+    "net": {
+        "port": 27017,
+        "unixDomainSocket": {
+            "enabled": true,
+            "pathPrefix": "/mongodb/tmp"
+        },
+        "ipv6": false,
+        "bindIpAll": true
+    },
+    "replication": {
+        "replSetName": "primary_main_db",
+        "enableMajorityReadConcern": true
+    },
+    "processManagement": {
+        "fork": false,
+        "pidFilePath": "/mongodb/tmp/mongodb.pid"
+    },
+    "setParameter": {
+        "enableLocalhostAuthBypass": true
+    },
+    "security": {
+        "authorization": "disabled",
+        "keyFile": "/mongodb/key.txt"
+    }
+}
