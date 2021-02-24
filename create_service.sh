@@ -111,7 +111,12 @@ cmd1="mongod --config $cur_dir/mongod.conf \\
     --logpath $logPath/mongodb.log"
 
 
-echo -e "use admin;\nrs.add({ host:'$CUR_HOST:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
+if [ "$7" = "secondary" ]
+then
+    echo -e "use admin;\nrs.add({ host:'$CUR_HOST:$port', priority: 0, votes: 0 });\nexit\n" > "$basedir/add_replicaset.js"
+else
+    echo -e "use admin;\nrs.addArb('$CUR_HOST:$port');\nexit\n" > "$basedir/add_replicaset.js"
+fi
 cmd2="mongo \\
     --username $MASTER_USERNAME \\
     --password $MASTER_PASSWORD \\
@@ -128,7 +133,7 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 Restart=always
-RestartSec=10
+RestartSec=20
 User=root
 ExecStart=/usr/bin/bash -c \"$cmd1\"
 StandardInput=tty-force

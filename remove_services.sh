@@ -13,7 +13,7 @@ MASTER_PASSWORD="root"
 CUR_HOST="127.0.0.1"
 
 START_FROM_PORT=27019
-END_TO_PORT=27040
+END_TO_PORT=27034
 
 for i in $(seq $START_FROM_PORT $END_TO_PORT);
 do   
@@ -27,6 +27,7 @@ do
     systemctl disable $service_file2
     rm -f /lib/systemd/system/service_file1 /lib/systemd/system/service_file2
     rm -f /etc/systemd/system/service_file1 /etc/systemd/system/service_file2
+    rm -rf $cur_dir/mongodb_replicaset/port_$i
 done
 
 # mongo  --authenticationDatabase admin --username root --password Cisco@123
